@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Delete Your Account — Bonva</title>
+<meta name="robots" content="noindex"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d0520;color:rgba(255,255,255,.88);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.75;}
+.wrap{max-width:640px;margin:0 auto;padding:60px 32px 100px;}
+.back{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,.45);font-size:13px;text-decoration:none;margin-bottom:40px;transition:color .15s;}
+.back:hover{color:rgba(255,255,255,.8);}
+.logo{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;background:linear-gradient(135deg,#fde68a,#f472b6,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.sub{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:48px;}
+h1{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;margin-bottom:8px;line-height:1.2;}
+.updated{font-size:12px;color:rgba(255,255,255,.35);margin-bottom:32px;}
+p{color:rgba(255,255,255,.7);margin-bottom:14px;line-height:1.7;}
+.warning-box{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.25);border-radius:16px;padding:20px 24px;margin-bottom:28px;font-size:14px;color:rgba(255,255,255,.7);}
+.warning-box strong{color:#f87171;}
+.info-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px;margin-bottom:28px;}
+.info-box h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:12px;}
+ul{color:rgba(255,255,255,.7);padding-left:20px;margin-bottom:14px;}
+ul li{margin-bottom:6px;}
+.option{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px;margin-bottom:16px;}
+.option-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#c0436a,#5B3F8C);color:#fff;font-size:13px;font-weight:700;margin-bottom:12px;}
+.option h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:8px;}
+.option ol{color:rgba(255,255,255,.7);padding-left:20px;}
+.option ol li{margin-bottom:6px;}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px;}
+input,textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:14px;color:#fff;outline:none;transition:border-color .2s;}
+input:focus,textarea:focus{border-color:rgba(192,67,106,.5);}
+textarea{resize:vertical;min-height:100px;line-height:1.6;}
+.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#c0436a,#5B3F8C);color:#fff;border:none;border-radius:50px;padding:14px 32px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(192,67,106,.35);transition:all .2s;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(192,67,106,.45);}
+.btn-ghost{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171;box-shadow:none;}
+.btn-ghost:hover{background:rgba(248,113,113,.15);transform:translateY(-1px);}
+.success{display:none;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);border-radius:16px;padding:20px 24px;margin-top:16px;color:#34d399;font-size:14px;}
+.divider{height:1px;background:rgba(255,255,255,.08);margin:40px 0;}
+.footer-note{font-size:12px;color:rgba(255,255,255,.3);text-align:center;line-height:1.7;}
+a{color:#fde68a;text-decoration:none;}
+a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="https://bonva.app" class="back">← Back to Bonva</a>
+  <div class="logo">bonva</div>
+  <div class="sub">devoted to you</div>
+
+  <h1>Delete Your Account</h1>
+  <div class="updated">Account & Data Deletion · SolenLabs LLC</div>
+
+  <p>We're sorry to see you go. You can delete your Bonva account and all associated data using one of the methods below. Deletion is permanent and cannot be undone.</p>
+
+  <div class="warning-box">
+    <strong>⚠️ This action is permanent.</strong> Deleting your account will remove your profile, quiz history, relationship scores, partner linking, and all personal data from our servers. This cannot be reversed.
+  </div>
+
+  <div class="info-box">
+    <h3>What gets deleted</h3>
+    <ul>
+      <li>Your profile — name, partner name, relationship info</li>
+      <li>Your Relationship Quiz scores and history</li>
+      <li>Your streak, mood logs, bucket list, timeline, and special dates</li>
+      <li>Your partner room code and any partner linking</li>
+      <li>Your Supabase account and authentication credentials</li>
+      <li>Your daily question answers</li>
+      <li>Any clinical notes in the Therapist Review area</li>
+    </ul>
+    <p style="margin-bottom:0;font-size:13px;color:rgba(255,255,255,.4);">Note: Payment records are retained by Stripe as required by financial regulations. Nova conversation content is not stored on our servers.</p>
+  </div>
+
+  <div class="option">
+    <div class="option-num">1</div>
+    <h3>Delete in the app — instant</h3>
+    <p style="margin-bottom:12px;">The fastest way to delete your local data:</p>
+    <ol>
+      <li>Open Bonva at <a href="https://bonva.app">bonva.app</a></li>
+      <li>Go to <strong>Settings</strong></li>
+      <li>Scroll to the bottom and tap <strong>Reset &amp; re-test onboarding</strong></li>
+      <li>Confirm — all local data is deleted immediately</li>
+    </ol>
+    <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.4);">This clears all data from your device. To also delete your Supabase account and server-side data, use the email request below.</p>
+  </div>
+
+  <div class="option">
+    <div class="option-num">2</div>
+    <h3>Request full account deletion — via email</h3>
+    <p style="margin-bottom:16px;">To permanently delete your Supabase account and all server-side data, submit a request below. We'll process it within <strong>7 business days</strong> and send a confirmation email.</p>
+
+    <div class="form-group">
+      <label class="form-label">Your email address</label>
+      <input type="email" id="delEmail" placeholder="The email you used to sign up"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Reason (optional)</label>
+      <textarea id="delReason" placeholder="You don't have to tell us, but we'd love to know how we can improve..."></textarea>
+    </div>
+    <button class="btn btn-ghost" onclick="submitDeletion()">🗑️ Request Account Deletion</button>
+    <div class="success" id="successMsg">
+      ✓ Request received. We'll delete your account within 7 business days and send a confirmation to your email. Thank you for using Bonva.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <p class="footer-note">
+    Questions? Contact us at <a href="mailto:support@bonva.app">support@bonva.app</a><br>
+    <a href="https://bonva.app/privacy.html">Privacy Policy</a> · <a href="https://bonva.app/terms.html">Terms of Service</a> · © 2026 SolenLabs LLC
+  </p>
+</div>
+
+<script>
+function submitDeletion(){
+  var email = document.getElementById('delEmail').value.trim();
+  var reason = document.getElementById('delReason').value.trim();
+
+  if(!email || !email.includes('@')){
+    document.getElementById('delEmail').style.borderColor = 'rgba(248,113,113,.5)';
+    setTimeout(function(){ document.getElementById('delEmail').style.borderColor = ''; }, 2000);
+    return;
+  }
+
+  var subject = encodeURIComponent('Account Deletion Request — Bonva');
+  var body = encodeURIComponent(
+    'Please delete my Bonva account and all associated data.\n\n' +
+    'Email: ' + email + '\n' +
+    (reason ? 'Reason: ' + reason + '\n' : '') +
+    '\nI understand this action is permanent and cannot be undone.\n\n' +
+    'Requested on: ' + new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})
+  );
+
+  window.location.href = 'mailto:support@bonva.app?subject=' + subject + '&body=' + body;
+
+  document.getElementById('successMsg').style.display = 'block';
+  document.querySelector('.btn-ghost').disabled = true;
+  document.querySelector('.btn-ghost').style.opacity = '.5';
+}
+</script>
+</body>
+</html>
