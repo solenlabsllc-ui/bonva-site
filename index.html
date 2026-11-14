@@ -3,7 +3,22 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Bonva – devoted to you</title>
+<title>Bonva — AI Relationship Coach for Couples</title>
+<meta name="description" content="Bonva is a relationship app for couples: a daily question, a relationship quiz and Nova, your AI coach. Free to start, Premium from $12.99 a month."/>
+<link rel="canonical" href="https://bonva.app/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Bonva"/>
+<meta property="og:url" content="https://bonva.app/"/>
+<meta property="og:title" content="Bonva — AI Relationship Coach for Couples"/>
+<meta property="og:description" content="One intentional question, one small moment, every day. A relationship quiz, daily questions and Nova, your AI coach. Free to start, Premium from $12.99 a month."/>
+<meta property="og:image" content="https://bonva.app/og-image.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Bonva — AI Relationship Coach for Couples"/>
+<meta name="twitter:description" content="One intentional question, one small moment, every day. A relationship quiz, daily questions and Nova, your AI coach. Free to start, Premium from $12.99 a month."/>
+<meta name="twitter:image" content="https://bonva.app/og-image.png"/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Bonva","alternateName":"Bonva, devoted to you","url":"https://bonva.app/","image":"https://bonva.app/og-image.png","description":"Bonva is a relationship app for couples: a daily question, a relationship health quiz and score, guided journeys and Nova, an AI relationship coach.","applicationCategory":"LifestyleApplication","operatingSystem":"Android, Web","installUrl":"https://play.google.com/store/apps/details?id=app.bonva","publisher":{"@type":"Organization","name":"SolenLabs LLC","url":"https://solenlabsllc.com"},"offers":[{"@type":"Offer","name":"Free plan: relationship quiz and daily questions","price":"0","priceCurrency":"USD"},{"@type":"Offer","name":"Bonva Premium, monthly","price":"12.99","priceCurrency":"USD"},{"@type":"Offer","name":"Bonva Premium, yearly","price":"84.99","priceCurrency":"USD"}]}
+</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cdefs%3E%3ClinearGradient id='fg' x1='0' y1='0' x2='60' y2='60' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0%25' stop-color='%23fde68a'/%3E%3Cstop offset='50%25' stop-color='%23f472b6'/%3E%3Cstop offset='100%25' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='60' height='60' rx='14' fill='%230d0520'/%3E%3Cpath d='M30 47C30 47 12 35 12 22c0-6.6 5.1-11 11-11 3 0 5.5 2.1 7 3.8 1.5-1.7 4-3.8 7-3.8 5.9 0 11 4.4 11 11C48 35 30 47 30 47z' stroke='url(%23fg)' stroke-width='3.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1069,6 +1084,19 @@ select option{background:#1a0a2e;}
     </div>
     <button class="sp-btn-start" onclick="dismissOpening()">Get Started — It's Free →</button>
     <button class="sp-btn-signin" onclick="openLoginModal()">Already have an account? Sign in</button>
+    <!-- SolenLabs family footer: website only, hidden inside the Android app -->
+    <div id="solenFooter" style="margin-top:14px;text-align:center;font-size:12px;line-height:1.9;color:rgba(255,255,255,.4);">
+      A <a href="https://solenlabsllc.com" target="_blank" rel="noopener" style="color:rgba(255,255,255,.6);text-decoration:none;">SolenLabs</a> app ·
+      <a href="https://play.google.com/store/apps/details?id=app.bonva" target="_blank" rel="noopener" style="color:rgba(255,255,255,.6);text-decoration:none;">Get it on Google Play</a><br/>
+      More from us:
+      <a href="https://drava.app/" target="_blank" rel="noopener" title="Drava, an AI dating coach for men" style="color:rgba(255,255,255,.6);text-decoration:none;">Drava</a> ·
+      <a href="https://fovuapp.app/" target="_blank" rel="noopener" title="Fovu, a conversation card game for dates" style="color:rgba(255,255,255,.6);text-decoration:none;">Fovu</a> ·
+      <a href="https://wedvow.app/" target="_blank" rel="noopener" title="WedVow, an AI wedding planner" style="color:rgba(255,255,255,.6);text-decoration:none;">WedVow</a><br/>
+      <a href="privacy.html" style="color:rgba(255,255,255,.6);text-decoration:none;">Privacy</a> ·
+      <a href="terms.html" style="color:rgba(255,255,255,.6);text-decoration:none;">Terms</a> ·
+      <a href="contact.html" style="color:rgba(255,255,255,.6);text-decoration:none;">Contact</a>
+    </div>
+    <script>if(window.BonvaAndroid){document.getElementById('solenFooter').style.display='none';}</script>
   </div>
 
 </div>
@@ -1351,7 +1379,7 @@ var CLAUDE_KEY = ''; // no longer needed in browser
 // ── Premium access codes — add/change as needed ─────────────────────────────
 var PREMIUM_CODES  = ['BONVA2025','SOLENLAUNCH','EARLYBIRD','BONVAPRO'];
 var IOS_URL        = '';
-var ANDROID_URL    = '';
+var ANDROID_URL    = 'https://play.google.com/store/apps/details?id=app.bonva';
 // Inside the Android app (window.BonvaAndroid) purchases go through Google Play Billing, never Stripe or access codes
 var IS_PLAY    = !!window.BonvaAndroid;
 var PLAY_PLANS = {monthly:['bonva_premium','monthly'], annual:['bonva_premium','yearly'], couples:['bonva_couples','monthly'], couples_annual:['bonva_couples','yearly']};
@@ -2630,7 +2658,7 @@ function renderSettings(c){
     +'<div class="card mb20"><div class="section-title">Get the Mobile App</div>'
     +'<p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Download Bonva for iOS & Android.</p>'
     +'<a href="'+(IOS_URL||'#')+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px;text-decoration:none;opacity:'+(IOS_URL?1:.5)+'"><span style="font-size:22px">🍎</span><span><span style="display:block;font-size:10px;color:var(--muted)">Coming soon</span><span style="display:block;font-size:14px;font-weight:600">App Store</span></span></a>'
-    +'<a href="'+(ANDROID_URL||'#')+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-decoration:none;opacity:'+(ANDROID_URL?1:.5)+'"><span style="font-size:22px">▶</span><span><span style="display:block;font-size:10px;color:var(--muted)">Coming soon</span><span style="display:block;font-size:14px;font-weight:600">Google Play</span></span></a>'
+    +'<a href="'+(ANDROID_URL||'#')+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-decoration:none;opacity:'+(ANDROID_URL?1:.5)+'"><span style="font-size:22px">▶</span><span><span style="display:block;font-size:10px;color:var(--muted)">'+(ANDROID_URL?'Get it on':'Coming soon')+'</span><span style="display:block;font-size:14px;font-weight:600">Google Play</span></span></a>'
     +'</div>'
     +'<div class="card mb20"><div class="section-title">Connect Partner 💑</div>'
     +'<p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Share a room code with your partner to link your accounts.</p>'
