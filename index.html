@@ -2363,7 +2363,7 @@ function renderJourneyDetail(c,id){
     +'<div class="prog-wrap a2 mb24" style="height:8px"><div class="prog-fill" style="width:'+Math.round((p/j.days)*100)+'%"></div></div>'
     +'<div class="a3">'+days+'</div>';
 }
-function completeDay(id,i){ jProg[id]=i+1; save('bonva_journeys',jProg); toast('Day '+(i+1)+' complete! 🎉'); renderJourneyDetail(document.getElementById('viewContent'),id); }
+function completeDay(id,i){ jProg[id]=i+1; save('bonva_journeys',jProg); pushSharedData(); toast('Day '+(i+1)+' complete! 🎉'); renderJourneyDetail(document.getElementById('viewContent'),id); }
 
 // ═══════════════════════════════════════════════════
 //  ACTIVITIES
@@ -2635,7 +2635,7 @@ function renderMood(c){
     +'<div class="card"><div class="section-title">Recent Check-ins</div>'+hist+'</div>'
     +'</div>';
 }
-function logMood(i){ var today=new Date().toLocaleDateString(); moodLog=moodLog.filter(function(m){return m.date!==today;}); moodLog.push({date:today,mood:i}); save('bonva_mood',moodLog); toast(MOODS[i].e+' Logged!'); nav('activities'); }
+function logMood(i){ var today=new Date().toLocaleDateString(); moodLog=moodLog.filter(function(m){return m.date!==today;}); moodLog.push({date:today,mood:i}); save('bonva_mood',moodLog); pushSharedData(); toast(MOODS[i].e+' Logged!'); nav('activities'); }
 
 // ── Bucket List ──────────────────────────────────
 function renderBucket(c){
@@ -2760,64 +2760,209 @@ function renderSettings(c){
     +'<a href="'+(IOS_URL||'#')+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px;text-decoration:none;opacity:'+(IOS_URL?1:.5)+'"><span style="font-size:22px">🍎</span><span><span style="display:block;font-size:10px;color:var(--muted)">Coming soon</span><span style="display:block;font-size:14px;font-weight:600">App Store</span></span></a>'
     +'<a href="'+(ANDROID_URL||'#')+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-decoration:none;opacity:'+(ANDROID_URL?1:.5)+'"><span style="font-size:22px">▶</span><span><span style="display:block;font-size:10px;color:var(--muted)">'+(ANDROID_URL?'Get it on':'Coming soon')+'</span><span style="display:block;font-size:14px;font-weight:600">Google Play</span></span></a>'
     +'</div>'
-    +'<div class="card mb20"><div class="section-title">Connect Partner 💑</div>'
-    +'<p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Share a room code with your partner to link your accounts.</p>'
-    +(profile.roomCode
-      ? '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px"><div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Your Code</div><div style="font-size:24px;font-weight:700;letter-spacing:4px;color:var(--white)">'+profile.roomCode+'</div></div>'
-      : '<button class="btn btn-ghost btn-sm mb12" onclick="generateRoomCode()">Generate Room Code →</button>')
-    +(profile.partnerCode
-      ? '<div style="font-size:13px;color:var(--green)">✓ Linked to code: '+profile.partnerCode+'</div>'
-      : '<div class="form-group mt8"><label class="form-label">Partner\'s Code</label><div style="display:flex;gap:8px"><input type="text" id="partnerCodeIn" placeholder="e.g. ROSE-4829" style="flex:1;text-transform:uppercase;letter-spacing:2px"><button class="btn btn-primary btn-sm" onclick="linkPartner()">Link</button></div></div>')
-    +'</div>'
+    +'<div class="card mb20" id="partnerCard">'+partnerCardHTML()+'</div>'
 
     +'<div class="card"><div class="section-title">Data & Privacy</div>'
     +'<p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Your data lives in your browser. <a href="privacy.html" style="color:var(--gold)">Privacy Policy</a> · <a href="terms.html" style="color:var(--gold)">Terms</a></p>'
     +'<button class="btn btn-ghost btn-sm" style="color:#f87171;border-color:rgba(248,113,113,.2)" onclick="if(confirm(\'Reset all data?\')){ localStorage.clear(); location.reload(); }">Reset All Data</button>'
     +'</div></div></div>';
+  partnerRefresh();
 }
-async function generateRoomCode(){
-  var words=['ROSE','LOVE','STAR','MOON','DAWN','GLOW','WARM','SOFT'];
-  var code=words[Math.floor(Math.random()*words.length)]+'-'+Math.floor(1000+Math.random()*9000);
-  profile.roomCode=code;
+// ═══════════════════════════════════════════════════
+//  PARTNER LINK (Settings → Partner) — 6-character codes, synced through Supabase
+// ═══════════════════════════════════════════════════
+var partnerState = { state: 'loading' };
+var partnerShared = null;     // partner's shared data (quiz scores, answers, wellness, insights)
+var partnerBusy = false;
+function esc(v){ return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function partnerErrMsg(e){
+  var m = String((e && (e.message||e.error_description)) || e || '');
+  if(m.indexOf('invalid_code')>-1) return 'That code didn\'t work. Check it with your partner — codes last 24 hours.';
+  if(m.indexOf('own_code')>-1) return 'That\'s your own code. Your partner enters it on their device.';
+  if(m.indexOf('already_linked')>-1) return 'One of you is already linked. Unlink first in Settings → Partner.';
+  if(m.indexOf('not_signed_in')>-1 || m.indexOf('JWT')>-1) return 'Please sign in again to link with your partner.';
+  if(m.indexOf('Failed to fetch')>-1 || m.indexOf('NetworkError')>-1) return 'You seem to be offline. Check your connection and try again.';
+  return 'Something went wrong. Please try again.';
+}
+function partnerName(){ return partnerState.partner_name || profile.partnerName || 'your partner'; }
+function partnerCardHTML(){
+  var h='<div class="section-title">Partner 💑</div>';
+  if(!supa) return h+'<p style="font-size:13px;color:var(--muted)">Partner linking needs an internet connection.</p>';
+  if(!currentUser) return h+'<p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Sign in on both devices to link your accounts and see each other\'s scores and answers.</p>'
+    +'<button class="btn btn-primary btn-sm" onclick="openLoginModal()" style="width:100%;justify-content:center;">Sign In / Create Account</button>';
+  var st=partnerState.state;
+  if(st==='loading') return h+'<div style="font-size:13px;color:var(--muted)">Checking your partner link…</div>';
+  if(st==='error') return h+'<div class="pl-err">'+esc(partnerState.message)+'</div><button class="btn btn-ghost btn-sm" onclick="partnerRefresh()">Try again</button>';
+  if(st==='linked'){
+    var since=partnerState.linked_at?new Date(partnerState.linked_at).toLocaleDateString():'';
+    return h+'<div class="pl-status"><span style="font-size:22px">💞</span><div><div style="font-size:14px;font-weight:700;color:var(--white)">Linked with '+esc(partnerName())+'</div>'
+      +'<div style="font-size:12px;color:var(--muted)">'+(since?'Since '+esc(since)+' · ':'')+'Quiz scores, daily answers, wellness and insights sync between your accounts.</div></div></div>'
+      +partnerSharedHTML()
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+      +'<button class="btn btn-ghost btn-sm" onclick="partnerSyncNow()" '+(partnerBusy?'disabled':'')+'>🔄 Sync now</button>'
+      +'<button class="btn btn-ghost btn-sm" style="color:#f87171;border-color:rgba(248,113,113,.2)" onclick="partnerUnlink()" '+(partnerBusy?'disabled':'')+'>Unlink</button></div>'
+      +'<div class="pl-err" id="plErr"></div>';
+  }
+  var join='<div class="form-group" style="margin-top:14px"><label class="form-label">Have your partner\'s code?</label>'
+    +'<div style="display:flex;gap:8px"><input type="text" id="partnerCodeIn" maxlength="7" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123" class="pl-input" onkeydown="if(event.key===\'Enter\')partnerJoin()">'
+    +'<button class="btn btn-primary btn-sm" onclick="partnerJoin()" '+(partnerBusy?'disabled':'')+'>Link</button></div><div class="pl-err" id="plErr"></div></div>';
+  if(st==='pending'){
+    var exp=partnerState.expires_at?new Date(partnerState.expires_at):null;
+    return h+'<p style="font-size:13px;color:var(--muted);margin-bottom:6px;line-height:1.6">Give this code to '+esc(partnerName())+'. They enter it in <b>Settings → Partner</b> on their own device.</p>'
+      +'<div class="pl-code">'+String(partnerState.code||'').split('').map(function(ch){return '<span>'+esc(ch)+'</span>';}).join('')+'</div>'
+      +'<div style="font-size:11px;color:var(--dim);text-align:center;margin-bottom:10px">'+(exp?'Expires '+esc(exp.toLocaleString([], {weekday:'short',hour:'numeric',minute:'2-digit'})):'')+'</div>'
+      +'<div style="display:flex;gap:8px;justify-content:center"><button class="btn btn-ghost btn-sm" onclick="partnerCopyCode()">📋 Copy code</button>'
+      +'<button class="btn btn-ghost btn-sm" onclick="partnerCancelCode()" '+(partnerBusy?'disabled':'')+'>Cancel code</button></div>'
+      +join;
+  }
+  return h+'<p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6">Link accounts so you each see the other\'s quiz scores, daily answers and progress — on your own devices.</p>'
+    +'<button class="btn btn-primary btn-sm" onclick="partnerCreateCode()" '+(partnerBusy?'disabled':'')+' style="width:100%;justify-content:center">Create a connection code</button>'
+    +join;
+}
+function partnerSharedHTML(){
+  var d=partnerShared;
+  if(!d) return '<div style="font-size:12px;color:var(--muted);margin-bottom:12px">'+esc(partnerName())+' hasn\'t synced any data yet.</div>';
+  var scores=Array.isArray(d.quiz_scores)?d.quiz_scores:[];
+  var last=scores.length?scores[scores.length-1]:null;
+  var w=d.wellness||{};
+  var today=bonvaTodayStr();
+  var ans=(Array.isArray(d.daily_answers)?d.daily_answers:[]).filter(function(x){return x&&x.date===today;})[0];
+  var ins=(Array.isArray(d.coaching_insights)?d.coaching_insights:[])[0];
+  return '<div class="pl-shared">'
+    +'<div><b>'+(last?esc(last.score):'—')+'</b><small>Latest quiz score</small></div>'
+    +'<div><b>'+(w.streak!=null?esc(w.streak):'—')+'</b><small>Day streak</small></div>'
+    +'<div><b>'+(w.mood?esc(w.mood.e||''):'—')+'</b><small>'+(w.mood?esc(w.mood.l||'')+' · '+esc(w.mood.date||''):'Mood check-in')+'</small></div>'
+    +'<div><b>'+(w.journeyDays!=null?esc(w.journeyDays):'—')+'</b><small>Journey days done</small></div></div>'
+    +(ans?'<div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:4px">Today\'s answer</div><div style="font-size:13px;color:var(--white);line-height:1.6;margin-bottom:10px">'+esc(ans.answer)+'</div>':'')
+    +(ins?'<div style="font-size:12px;color:var(--lavender);font-weight:700;margin-bottom:4px">Latest insight</div><div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px">'+esc(ins.text)+'</div>':'')
+    +'<div style="font-size:11px;color:var(--dim);margin-bottom:12px">Last synced '+(d.updated_at?esc(new Date(d.updated_at).toLocaleString()):'—')+'</div>';
+}
+function bonvaTodayStr(){ var n=new Date(); return n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate(); }
+function partnerRerender(){ var el=document.getElementById('partnerCard'); if(el) el.innerHTML=partnerCardHTML(); }
+function partnerShowErr(msg){ var el=document.getElementById('plErr'); if(el) el.textContent=msg; else toast(msg); }
+function applyPartnerState(st){
+  partnerState=st||{state:'none'};
+  if(partnerState.state==='linked'){
+    profile.partnerId=partnerState.partner_id;
+    if(partnerState.partner_name && !profile.partnerName) profile.partnerName=partnerState.partner_name;
+    if(partnerState.partner_paid && !PAID){ PAID=true; save('bonva_paid','1'); updateSidebar(); }
+  } else {
+    delete profile.partnerId; delete profile.partnerCode; partnerShared=null;
+  }
   save('bonva_profile',profile);
-  await syncUp();
-  toast('Room code created: '+code+' — share it with your partner!');
-  nav('settings');
 }
-async function linkPartner(){
-  var inp=document.getElementById('partnerCodeIn');
-  if(!inp||!inp.value.trim()){toast('Enter your partner\'s code first 😊');return;}
-  var code=inp.value.trim().toUpperCase();
-  if(!supa||!currentUser){ profile.partnerCode=code; save('bonva_profile',profile); toast('✓ Linked locally.'); nav('settings'); return; }
-  // Look up partner by room_code in Supabase
-  try {
-    var res=await supa.from('profiles').select('id,paid,my_name').eq('room_code',code).single();
-    if(res.error||!res.data){ toast('Code not found — make sure your partner generated it first.'); return; }
-    var partner=res.data;
-    profile.partnerCode=code;
-    profile.partnerId=partner.id;
-    // If partner has paid, grant premium to this user too
-    if(partner.paid){ PAID=true; save('bonva_paid','1'); }
-    save('bonva_profile',profile);
-    // Write our partner_id to Supabase and also update partner's partner_id to point back at us
+async function partnerRefresh(){
+  if(!supa||!currentUser){ partnerRerender(); return; }
+  try{
+    var r=await supa.rpc('bonva_partner_status');
+    if(r.error) throw r.error;
+    applyPartnerState(r.data);
+    if(partnerState.state==='linked') await fetchPartnerData();
+  }catch(e){ console.warn('partner status:',e); partnerState={state:'error',message:partnerErrMsg(e)}; }
+  partnerRerender();
+}
+async function partnerRun(fn){
+  if(partnerBusy) return; partnerBusy=true; partnerRerender();
+  try{ await fn(); }
+  catch(e){ console.warn('partner:',e); partnerBusy=false; partnerRerender(); partnerShowErr(partnerErrMsg(e)); return; }
+  partnerBusy=false; partnerRerender();
+}
+function partnerCreateCode(){
+  return partnerRun(async function(){
     await syncUp();
-    await supa.from('profiles').update({partner_id:currentUser.id,paid:PAID||partner.paid}).eq('id',partner.id);
-    toast('✓ Connected with '+(partner.my_name||'your partner')+'! You\'re now linked.');
-    if(PAID) toast('✦ Premium activated on both accounts!');
-    updateSidebar();
-    nav('settings');
-  } catch(e){ toast('Something went wrong — please try again.'); console.warn(e); }
+    var r=await supa.rpc('bonva_partner_create_code'); if(r.error) throw r.error;
+    partnerState={state:'pending',code:r.data.code,expires_at:r.data.expires_at};
+    toast('Code ready: '+r.data.code+' — share it with your partner 💌');
+  });
 }
-// ── Fetch partner's latest data from Supabase ──
+// Kept for older buttons (dashboard card)
+function generateRoomCode(){ nav('settings'); setTimeout(partnerCreateCode,300); }
+function partnerCancelCode(){
+  return partnerRun(async function(){
+    var r=await supa.rpc('bonva_partner_cancel_code'); if(r.error) throw r.error;
+    partnerState={state:'none'};
+  });
+}
+function partnerCopyCode(){
+  var c=partnerState.code||'';
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(c).then(function(){toast('Code copied ✓');},function(){toast('Your code: '+c);}); }
+  else toast('Your code: '+c);
+}
+function partnerJoin(){
+  var inp=document.getElementById('partnerCodeIn');
+  var code=(inp&&inp.value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(code.length!==6){ partnerShowErr('Codes are 6 letters and numbers, like ABC123.'); return; }
+  return partnerRun(async function(){
+    await syncUp();
+    var r=await supa.rpc('bonva_partner_join',{p_code:code}); if(r.error) throw r.error;
+    await partnerRefresh();
+    toast('💞 You\'re linked with '+partnerName()+'!');
+  });
+}
+// Kept for older callers
+function linkPartner(){ return partnerJoin(); }
+function partnerUnlink(){
+  if(!confirm('Unlink from '+partnerName()+'? You\'ll both stop seeing each other\'s shared data. Your own data stays on your account.')) return;
+  return partnerRun(async function(){
+    var r=await supa.rpc('bonva_partner_unlink'); if(r.error) throw r.error;
+    applyPartnerState({state:'none'});
+    toast('Unlinked. You can link again any time.');
+  });
+}
+function partnerSyncNow(){
+  return partnerRun(async function(){ await syncUp(); await partnerRefresh(); toast('Synced ✓'); });
+}
+// ── What I share with my linked partner (no Nova chat transcripts, no notes) ──
+async function pushSharedData(){
+  if(!supa||!currentUser) return;
+  try{
+    var today=bonvaTodayStr();
+    var dq=getDailyQ&&getDailyQ();
+    var answers=[];
+    try{ answers=JSON.parse(localStorage.getItem('bonva_shared_answers')||'[]'); }catch(e){}
+    if(profile.dqAnswer&&profile.dqAnswerDate){
+      answers=answers.filter(function(a){return a.date!==profile.dqAnswerDate;});
+      answers.push({date:profile.dqAnswerDate,question:(profile.dqAnswerDate===today&&dq)?dq.q:null,answer:String(profile.dqAnswer).slice(0,2000)});
+      answers=answers.slice(-14);
+      localStorage.setItem('bonva_shared_answers',JSON.stringify(answers));
+    }
+    var lastMood=moodLog.length?moodLog[moodLog.length-1]:null;
+    var jp={}; try{ jp=JSON.parse(localStorage.getItem('bonva_journeys')||'{}'); }catch(e){}
+    var journeyDays=Object.keys(jp).reduce(function(t,k){return t+(parseInt(jp[k])||0);},0);
+    var ls=scoreHistory.length?scoreHistory[scoreHistory.length-1]:null;
+    var insights=[];
+    if(ls&&ls.cats){
+      var change=ls.score-scoreHistory[0].score;
+      insights.push({date:ls.date||today,source:'progress',text:progressInsight(ls.cats,change).replace(/<[^>]+>/g,'')});
+    }
+    var row={
+      user_id:currentUser.id,
+      display_name:(profile.myName||'').slice(0,80)||null,
+      quiz_scores:scoreHistory.slice(-20).map(function(x){return {date:x.date,score:x.score,cats:x.cats||null};}),
+      daily_answers:answers,
+      wellness:{streak:streak,mood:lastMood?{date:lastMood.date,e:(MOODS[lastMood.mood]||{}).e,l:(MOODS[lastMood.mood]||{}).l}:null,journeyDays:journeyDays,latestScore:ls?ls.score:null,checkins:scoreHistory.length},
+      coaching_insights:insights,
+      updated_at:new Date().toISOString()
+    };
+    var r=await supa.from('partner_shared_data').upsert(row,{onConflict:'user_id'});
+    if(r.error) console.warn('pushSharedData:',r.error.message);
+  }catch(e){ console.warn('pushSharedData failed:',e); }
+}
+// ── Fetch partner's latest shared data (RLS only returns it while linked) ──
 async function fetchPartnerData(){
   if(!supa||!currentUser||!profile.partnerId) return null;
   try {
-    var res=await supa.from('profiles').select('my_name,score_history,paid,dq_answer,dq_answer_date').eq('id',profile.partnerId).single();
-    if(res.data){
-      // If partner has paid, make sure we have premium too
-      if(res.data.paid && !PAID){ PAID=true; save('bonva_paid','1'); updateSidebar(); }
-      return res.data;
-    }
+    var res=await supa.from('partner_shared_data').select('*').eq('user_id',profile.partnerId).maybeSingle();
+    if(res.error) throw res.error;
+    partnerShared=res.data||null;
+    if(!res.data) return null;
+    var d=res.data, ans=(d.daily_answers||[]);
+    var latest=ans.length?ans[ans.length-1]:null;
+    // Same shape the dashboard and daily question already expect
+    return { my_name:d.display_name||partnerState.partner_name||null,
+             score_history:JSON.stringify(d.quiz_scores||[]),
+             dq_answer:latest?latest.answer:null, dq_answer_date:latest?latest.date:null,
+             wellness:d.wellness||{}, coaching_insights:d.coaching_insights||[] };
   } catch(e){ console.warn('fetchPartnerData failed:',e); }
   return null;
 }
@@ -2829,7 +2974,7 @@ function saveProfile(){ profile.myName=document.getElementById('stMy').value.tri
 async function loadPartnerScoreCard(myScore){
   var card=document.getElementById('partnerScoreCard');
   if(!card) return;
-  var partnerName=profile.partnerName||'Your partner';
+  var partnerName=esc(profile.partnerName||'Your partner');
 
   if(!profile.partnerId){
     // Not linked yet — show connect prompt
@@ -2838,10 +2983,7 @@ async function loadPartnerScoreCard(myScore){
       +'<div style="flex:1">'
       +'<div style="font-size:15px;font-weight:700;color:var(--lavender);margin-bottom:4px;">Compare scores with '+partnerName+'</div>'
       +'<p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Link your accounts to see each other\'s scores side by side.</p>'
-      +(profile.roomCode
-        ? '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;margin-bottom:10px"><div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Your Room Code</div><div style="font-size:22px;font-weight:700;letter-spacing:4px">'+profile.roomCode+'</div></div>'
-        : '<button class="btn btn-ghost btn-sm mb10" onclick="generateRoomCode()">Generate a room code →</button>')
-      +'<button class="btn btn-ghost btn-sm" onclick="nav(\x27settings\x27)">⚙️ Connect in Settings</button>'
+      +'<button class="btn btn-ghost btn-sm" onclick="nav(\x27settings\x27)">💞 Link in Settings → Partner</button>'
       +'</div></div>';
     return;
   }
@@ -2860,7 +3002,7 @@ async function loadPartnerScoreCard(myScore){
     return;
   }
 
-  var ps=partnerLatest.score;
+  var ps=parseInt(partnerLatest.score,10)||0;
   var diff=myScore-ps;
   var diffStr=(diff>0?'+':'')+diff;
   var diffCol=diff>0?'var(--green)':diff<0?'var(--pink)':'var(--gold)';
@@ -2875,7 +3017,7 @@ async function loadPartnerScoreCard(myScore){
     +'<div style="font-size:11px;color:var(--muted)">/ 100</div>'
     +'</div>'
     +'<div style="text-align:center;background:rgba(255,255,255,.04);border-radius:14px;padding:20px 12px">'
-    +'<div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+(partner.my_name||partnerName)+'</div>'
+    +'<div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+esc(partner.my_name||partnerName)+'</div>'
     +'<div style="font-size:36px;font-weight:700;color:'+psc+'">'+ps+'</div>'
     +'<div style="font-size:11px;color:var(--muted)">/ 100</div>'
     +'</div></div>'
@@ -2905,11 +3047,11 @@ async function loadPartnerDQAnswer(){
   var todayStr=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate();
   var partner=await fetchPartnerData();
   if(!partner||partner.dq_answer_date!==todayStr){
-    el.innerHTML='<div style="font-size:13px;color:var(--muted);font-style:italic">'+(profile.partnerName||'Your partner')+' hasn\'t answered yet today…</div>';
+    el.innerHTML='<div style="font-size:13px;color:var(--muted);font-style:italic">'+esc(profile.partnerName||'Your partner')+' hasn\'t answered yet today…</div>';
     return;
   }
-  el.innerHTML='<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px;">'+(partner.my_name||profile.partnerName||'Partner')+' answered:</div>'
-    +'<div style="font-size:14px;color:var(--white);line-height:1.65;background:rgba(255,255,255,.04);border-radius:12px;padding:14px 16px">'+partner.dq_answer+'</div>';
+  el.innerHTML='<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px;">'+esc(partner.my_name||profile.partnerName||'Partner')+' answered:</div>'
+    +'<div style="font-size:14px;color:var(--white);line-height:1.65;background:rgba(255,255,255,.04);border-radius:12px;padding:14px 16px">'+esc(partner.dq_answer)+'</div>';
 }
 
 // ═══════════════════════════════════════════════════
@@ -3418,6 +3560,7 @@ async function syncUp(){
       updated_at: new Date().toISOString()
     }, { onConflict: 'id' });
   } catch(e){ console.warn('syncUp failed:', e); }
+  await pushSharedData();
 }
 
 // ── Pull Supabase profile down into local state ──
@@ -3440,6 +3583,7 @@ async function syncDown(uid){
       if(d.paid){ PAID = true; save('bonva_paid','1'); }
       profile.onboarded = true;
       save('bonva_profile', profile);
+      setTimeout(partnerRefresh, 0);
       return true;
     }
   } catch(e){ console.warn('syncDown failed:', e); }
