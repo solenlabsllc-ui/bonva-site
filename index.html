@@ -1076,6 +1076,12 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 @keyframes cfFall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
 .cs-card .stat-val{display:flex;align-items:baseline;gap:6px;}
 .cs-saves{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* ── Never scroll sideways (Nov 18) ── */
+html,body{overflow-x:hidden;max-width:100%;}
+#viewContent,.card,.grid-2>*,.grid-3>*,.grid-4>*{min-width:0;max-width:100%;box-sizing:border-box;}
+#viewContent input,#viewContent select,#viewContent textarea{max-width:100%;box-sizing:border-box;}
+#viewContent a,#viewContent div{overflow-wrap:anywhere;}
 </style>
 </head>
 <body>
@@ -1463,6 +1469,8 @@ var IOS_URL        = '';
 var ANDROID_URL    = 'https://play.google.com/store/apps/details?id=app.bonva';
 // Inside the Android app (window.BonvaAndroid) purchases go through Google Play Billing, never Stripe or access codes
 var IS_PLAY    = !!window.BonvaAndroid;
+// Inside the Bonva Android app, even an older build without billing (Android WebView, not Facebook/Instagram browsers)
+var IN_ANDROID_APP = IS_PLAY || (/; wv\)/.test(navigator.userAgent||'') && !/FBAN|FBAV|Instagram|Line\//.test(navigator.userAgent||''));
 var PLAY_PLANS = {monthly:['bonva_premium','monthly'], annual:['bonva_premium','yearly'], couples:['bonva_couples','monthly'], couples_annual:['bonva_couples','yearly']};
 var PLAY_MANAGE_URL = 'https://play.google.com/store/account/subscriptions?package=app.bonva';
 var playBuying = false;
@@ -1929,6 +1937,10 @@ function selPlan(p){
   document.getElementById('pOptA').classList.toggle('sel',p==='annual');
 }
 function goPay(){
+  if(IN_ANDROID_APP && !IS_PLAY && !window.BonvaAndroid){
+    toast('In-app purchases arrive with the next Bonva update on Google Play. Please update the app.');
+    return;
+  }
   var plan = selPlanVal || 'monthly';
   var offer = promoFor(plan);
   if(IS_PLAY || !!window.BonvaAndroid){
@@ -2936,7 +2948,7 @@ function renderSettings(c){
     :'<p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">Unlock Nova, Journeys, Love Language Quiz, and all premium features.</p><button class="btn btn-gold btn-lg w100" onclick="openUpgrade()" style="justify-content:center;border-radius:14px">✦ Upgrade to Premium</button>'
       +(IS_PLAY?'<button class="btn btn-ghost btn-sm w100" onclick="restorePlayPurchases()" style="justify-content:center;margin-top:10px">Restore Purchases</button>':''))
     +'</div>'
-    +(IS_PLAY?'':'<div class="card mb20"><div class="section-title">Get the Mobile App</div>'
+    +(IN_ANDROID_APP?'':'<div class="card mb20"><div class="section-title">Get the Mobile App</div>'
     +'<p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Download Bonva for iOS & Android.</p>'
     +'<a href="'+(IOS_URL||'#')+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px;text-decoration:none;opacity:'+(IOS_URL?1:.5)+'"><span style="font-size:22px">🍎</span><span><span style="display:block;font-size:10px;color:var(--muted)">Coming soon</span><span style="display:block;font-size:14px;font-weight:600">App Store</span></span></a>'
     +'<a href="'+(ANDROID_URL||'#')+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-decoration:none;opacity:'+(ANDROID_URL?1:.5)+'"><span style="font-size:22px">▶</span><span><span style="display:block;font-size:10px;color:var(--muted)">'+(ANDROID_URL?'Get it on':'Coming soon')+'</span><span style="display:block;font-size:14px;font-weight:600">Google Play</span></span></a>'
