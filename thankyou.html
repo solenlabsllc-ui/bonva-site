@@ -119,11 +119,11 @@ if(plan === 'couples' || plan === 'couples_annual'){
   ctaBtn.href = 'https://bonva.app?paid=1&plan=' + plan;
 } else if(plan === 'annual'){
   badge.className = 'plan-badge annual';
-  badge.textContent = '✦ Annual Premium Unlocked';
+  badge.textContent = '✦ Individual Annual Unlocked';
   sub.textContent = 'You\'re set for the whole year. Everything is unlocked — go make it count. ❤️';
 } else {
   badge.className = 'plan-badge individual';
-  badge.textContent = '✦ Individual Premium Unlocked';
+  badge.textContent = '✦ Individual Unlocked';
   sub.textContent = 'Everything is unlocked and ready for you. Nova is waiting. ❤️';
 }
 
@@ -142,6 +142,14 @@ function fireConfetti(){
 window.addEventListener('load', function(){ setTimeout(fireConfetti, 400); });
 
 localStorage.setItem('bonva_paid', '1');
+// Launch special = one payment for a set time (2 months or 2 years), no auto-renew
+if(params.get('offer') === 'bogo'){
+  var days = plan === 'annual' ? 730 : 61;
+  localStorage.setItem('bonva_paid_until', String(Date.now() + days*86400000));
+  sub.textContent = (plan === 'annual' ? 'Your 2 years' : 'Your 2 months') + ' of Bonva Individual start now. Buy 1, get 1 free. No auto-renew. ❤️';
+} else {
+  localStorage.removeItem('bonva_paid_until');
+}
 if(plan === 'couples' || plan === 'couples_annual'){
   localStorage.setItem('bonva_couples', '1');
 }

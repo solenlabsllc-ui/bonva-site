@@ -2,22 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>Bonva — AI Relationship Coach for Couples</title>
-<meta name="description" content="Bonva is a relationship app for couples: a daily question, a relationship quiz and Nova, your AI coach. Free to start, Premium from $12.99 a month."/>
+<meta name="description" content="Bonva is a relationship app for couples: a daily question, a relationship quiz and Nova, your AI coach. Free to start, Individual from $5.99 a month."/>
 <link rel="canonical" href="https://bonva.app/"/>
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="Bonva"/>
 <meta property="og:url" content="https://bonva.app/"/>
 <meta property="og:title" content="Bonva — AI Relationship Coach for Couples"/>
-<meta property="og:description" content="One intentional question, one small moment, every day. A relationship quiz, daily questions and Nova, your AI coach. Free to start, Premium from $12.99 a month."/>
+<meta property="og:description" content="One intentional question, one small moment, every day. A relationship quiz, daily questions and Nova, your AI coach. Free to start, Individual from $5.99 a month."/>
 <meta property="og:image" content="https://bonva.app/og-image.png"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Bonva — AI Relationship Coach for Couples"/>
-<meta name="twitter:description" content="One intentional question, one small moment, every day. A relationship quiz, daily questions and Nova, your AI coach. Free to start, Premium from $12.99 a month."/>
+<meta name="twitter:description" content="One intentional question, one small moment, every day. A relationship quiz, daily questions and Nova, your AI coach. Free to start, Individual from $5.99 a month."/>
 <meta name="twitter:image" content="https://bonva.app/og-image.png"/>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Bonva","alternateName":"Bonva, devoted to you","url":"https://bonva.app/","image":"https://bonva.app/og-image.png","description":"Bonva is a relationship app for couples: a daily question, a relationship health quiz and score, guided journeys and Nova, an AI relationship coach.","applicationCategory":"LifestyleApplication","operatingSystem":"Android, Web","installUrl":"https://play.google.com/store/apps/details?id=app.bonva","publisher":{"@type":"Organization","name":"SolenLabs LLC","url":"https://solenlabsllc.com"},"offers":[{"@type":"Offer","name":"Free plan: relationship quiz and daily questions","price":"0","priceCurrency":"USD"},{"@type":"Offer","name":"Bonva Premium, monthly","price":"12.99","priceCurrency":"USD"},{"@type":"Offer","name":"Bonva Premium, yearly","price":"84.99","priceCurrency":"USD"}]}
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Bonva","alternateName":"Bonva, devoted to you","url":"https://bonva.app/","image":"https://bonva.app/og-image.png","description":"Bonva is a relationship app for couples: a daily question, a relationship health quiz and score, guided journeys and Nova, an AI relationship coach.","applicationCategory":"LifestyleApplication","operatingSystem":"Android, Web","installUrl":"https://play.google.com/store/apps/details?id=app.bonva","publisher":{"@type":"Organization","name":"SolenLabs LLC","url":"https://solenlabsllc.com"},"offers":[{"@type":"Offer","name":"Free plan: relationship quiz and daily questions","price":"0","priceCurrency":"USD"},{"@type":"Offer","name":"Bonva Individual, monthly","price":"5.99","priceCurrency":"USD"},{"@type":"Offer","name":"Bonva Individual, yearly","price":"59.99","priceCurrency":"USD"},{"@type":"Offer","name":"Bonva Couples, monthly","price":"9.99","priceCurrency":"USD"},{"@type":"Offer","name":"Bonva Couples, yearly","price":"99.99","priceCurrency":"USD"}]}
 </script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cdefs%3E%3ClinearGradient id='fg' x1='0' y1='0' x2='60' y2='60' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0%25' stop-color='%23fde68a'/%3E%3Cstop offset='50%25' stop-color='%23f472b6'/%3E%3Cstop offset='100%25' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='60' height='60' rx='14' fill='%230d0520'/%3E%3Cpath d='M30 47C30 47 12 35 12 22c0-6.6 5.1-11 11-11 3 0 5.5 2.1 7 3.8 1.5-1.7 4-3.8 7-3.8 5.9 0 11 4.4 11 11C48 35 30 47 30 47z' stroke='url(%23fg)' stroke-width='3.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
@@ -1039,6 +1039,25 @@ select option{background:#1a0a2e;}
   #hero.app-mode .hero-inner{justify-content:center;}
   #hero.app-mode{padding:10px 16px;}
 }
+/* ── Phone fit (Nov 18): never let big system text push things off screen ── */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+:root{--safe-top:max(env(safe-area-inset-top),var(--wv-top,0px));--safe-bot:max(env(safe-area-inset-bottom),var(--wv-bot,0px));}
+#app{padding-top:var(--safe-top);box-sizing:border-box;}
+#onboardGate,#openingPage,#splashPage{padding-top:calc(var(--safe-top) + 16px) !important;}
+.sp-logo{font-size:min(72px,17vw) !important;letter-spacing:-.04em;}
+.hero-logo-text{font-size:min(77px,16vw);letter-spacing:-.04em;max-width:100%;}
+.op-logo,.op-word,.opening-logo{max-width:100%;}
+@media(max-width:900px){
+  .hero-logo-text{font-size:min(64px,15vw) !important;}
+  #hero.app-mode .hero-logo-text{font-size:min(44px,11vw) !important;}
+  .hero-tagline{font-size:min(12px,3.2vw) !important;letter-spacing:.3em !important;}
+  #topbar{justify-content:flex-end;}
+  .bn-label{font-size:min(10px,2.6vw);letter-spacing:0;max-width:none;overflow:visible;text-overflow:clip;}
+  #bottomNav{padding-bottom:calc(8px + var(--safe-bot));}
+  .ob-title{font-size:min(38px,9vw) !important;line-height:1.1;}
+  .ob-card{max-width:100%;box-sizing:border-box;}
+}
+.tb-title{display:none !important;}
 </style>
 </head>
 <body>
@@ -1273,33 +1292,35 @@ select option{background:#1a0a2e;}
 <div class="modal-bg" id="upgradeModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('upgradeModal')">✕</button>
-    <div class="modal-title" id="upgradeTitle">Unlock Premium ✦</div>
+    <div class="modal-title" id="upgradeTitle">Unlock Bonva ✦</div>
     <p class="modal-from" id="upgradeFrom" style="display:none"></p>
     <div class="promo-banner" id="promoBanner" style="display:none">
-      <div class="promo-kicker">✦ Introductory special</div>
-      <div class="promo-headline" id="promoHeadline">Buy 1 Month, Get 2 Months Free</div>
+      <div class="promo-kicker">✦ Launch special</div>
+      <div class="promo-headline" id="promoHeadline"></div>
       <div class="promo-terms" id="promoTerms"></div>
     </div>
     <p class="modal-sub">Full access to Nova, all Journeys, Love Language Quiz, and every premium feature.</p>
     <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Individual</div>
     <div class="price-opt sel" id="pOptM" onclick="selPlan('monthly')">
-      <div class="price-opt-head"><span class="price-name">Monthly</span><span class="price-amt">$12<span style="font-size:13px;color:var(--muted)">.99/mo</span></span></div>
+      <div class="price-opt-head"><span class="price-name">Individual Monthly</span><span class="price-amt">$5<span style="font-size:13px;color:var(--muted)">.99/mo</span></span></div>
       <div class="price-sub">Cancel anytime · Card, Apple Pay, Google Pay</div>
-      <div class="promo-tag">🎁 Buy 1 Month, Get 2 Months Free</div>
+      <div class="promo-tag" id="tagM">🎁 Buy 1, Get 1 Free: 2 months for $5.99</div>
     </div>
     <div class="price-opt" id="pOptA" onclick="selPlan('annual')">
-      <div class="price-opt-head"><span class="price-name">Annual <span class="price-save">Save 45%</span></span><span class="price-amt">$84<span style="font-size:13px;color:var(--muted)">.99/yr</span></span></div>
-      <div class="price-sub">Just $7.08/month · Best value</div>
-      <div class="promo-tag">🎁 Buy 1 Year, Get 2 Years Free</div>
+      <div class="price-opt-head"><span class="price-name">Individual Annual <span class="price-save">Save 17%</span></span><span class="price-amt">$59<span style="font-size:13px;color:var(--muted)">.99/yr</span></span></div>
+      <div class="price-sub">Just $5.00/month · Best value</div>
+      <div class="promo-tag" id="tagA">🎁 Buy 1, Get 1 Free: 2 years for $59.99</div>
     </div>
     <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:10px 0 8px;">Couples 💑</div>
     <div class="price-opt" id="pOptC" onclick="selPlan('couples')">
-      <div class="price-opt-head"><span class="price-name">Couples Monthly</span><span class="price-amt">$19<span style="font-size:13px;color:var(--muted)">.99/mo</span></span></div>
-      <div class="price-sub">Both partners · Linked accounts with shared scores & sync</div>
+      <div class="price-opt-head"><span class="price-name">Couples Monthly</span><span class="price-amt">$9<span style="font-size:13px;color:var(--muted)">.99/mo</span></span></div>
+      <div class="price-sub">Both partners, each on your own phone · Shared scores &amp; sync</div>
+      <div class="promo-tag" id="tagC">🎁 Buy one, your partner's is free</div>
     </div>
     <div class="price-opt" id="pOptCA" onclick="selPlan('couples_annual')">
-      <div class="price-opt-head"><span class="price-name">Couples Annual <span class="price-save">Best value</span></span><span class="price-amt">$149<span style="font-size:13px;color:var(--muted)">.99/yr</span></span></div>
-      <div class="price-sub">Just $12.50/month per couple · Full year access</div>
+      <div class="price-opt-head"><span class="price-name">Couples Annual <span class="price-save">Save 17%</span></span><span class="price-amt">$99<span style="font-size:13px;color:var(--muted)">.99/yr</span></span></div>
+      <div class="price-sub">Just $8.33/month for both of you</div>
+      <div class="promo-tag" id="tagCA">🎁 Buy one, your partner's is free</div>
     </div>
     <button class="btn btn-primary w100" style="margin-top:8px;justify-content:center;border-radius:14px;padding:14px;font-size:14px;" onclick="goPay()">Continue to Payment →</button>
     <p id="payNote" style="font-size:11px;color:var(--dim);text-align:center;margin-top:10px;">Secure payments via Stripe · 24-hour refund policy</p>
@@ -1390,18 +1411,24 @@ window.onerror = function(msg, src, line){
 // ═══════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════
-var STRIPE_MONTHLY        = 'https://buy.stripe.com/8x25kE96L3aF3tn1J33wQ00';
-var STRIPE_ANNUAL         = 'https://buy.stripe.com/6oUaEY4QvfXr8NHevP3wQ02';
-var STRIPE_COUPLES        = 'https://buy.stripe.com/dRmcN6aaPdPjbZT4Vf3wQ01';
-var STRIPE_COUPLES_ANNUAL = 'https://buy.stripe.com/5kQcN65UzcLfbZTdrL3wQ03';
-// ── Introductory special: "Buy 1, Get 2 Free" ────────────────────────────────
-// The offer banner only shows once Stripe can honor it. Set it up in Stripe first, then
-// fill in EITHER a dedicated Payment Link for the offer (preferred) OR a promotion code
-// that the regular Payment Link accepts ("Allow promotion codes" must be on).
+// ── Plans and payment links (updated Nov 18, 2026) ─────────────────────────────
+// Individual: $5.99/mo or $59.99/yr · Couples: $9.99/mo or $99.99/yr (one plan covers both partners)
+// Launch special (web/Stripe): Individual Buy 1, Get 1 Free, one payment that doesn't auto-renew:
+//   $5.99 = 2 months, $59.99 = 2 years. Turn off with SPECIAL_ON = false to use the regular links.
+var SPECIAL_ON = true;
+var STRIPE_LINKS = {
+  special: { monthly:'https://buy.stripe.com/bJe6oI82Hh1v2pjgDX3wQ0q', annual:'https://buy.stripe.com/6oUdRaaaPeTn0hbafz3wQ0r' },
+  regular: { monthly:'https://buy.stripe.com/dRm14oaaP8uZ1lfbjD3wQ0o', annual:'https://buy.stripe.com/7sY28s6YDfXr7JDdrL3wQ0p' },
+  couples:        'https://buy.stripe.com/dRm14o96L12x2pj0EZ3wQ0m',
+  couples_annual: 'https://buy.stripe.com/7sY14oaaPh1v8NHafz3wQ0n'
+};
+var SPECIAL_DAYS = { monthly: 61, annual: 730 };   // access bought by one special payment
 var PROMO = {
-  monthly: { id:'b1g2_monthly', headline:'Buy 1 Month, Get 2 Months Free', terms:'Pay for your first month and get the next 2 months free. Then $12.99/month. Cancel anytime.', link:'', code:'' },
-  annual:  { id:'b1g2_annual',  headline:'Buy 1 Year, Get 2 Years Free',   terms:'Pay for your first year and get the next 2 years free. Then $84.99/year. Cancel anytime.', link:'', code:'' },
-  playLive: false   // Google Play: set true only after matching offers exist in Play Console
+  monthly:        { id:'bogo_individual_monthly', headline:'Buy 1, Get 1 Free', terms:'Pay $5.99 once for 2 months of Bonva Individual. No auto-renew.' },
+  annual:         { id:'bogo_individual_annual',  headline:'Buy 1, Get 1 Free', terms:'Pay $59.99 once for 2 years of Bonva Individual. No auto-renew.' },
+  couples:        { id:'couples_partner_free', headline:'Buy one, your partner\'s is free', terms:'One Couples plan covers both of you, each on your own phone. $9.99/month.' },
+  couples_annual: { id:'couples_partner_free', headline:'Buy one, your partner\'s is free', terms:'One Couples plan covers both of you, each on your own phone. $99.99/year.' },
+  playLive: false   // Google Play intro prices: set true once Gemini has the offers live in Play Console
 };
 // ── Supabase ──────────────────────────────────────────────────────────────────
 var SUPABASE_URL     = 'https://etsamfrennwuovjfdakk.supabase.co';
@@ -1426,6 +1453,10 @@ var playBuying = false;
 //  STATE
 // ═══════════════════════════════════════════════════
 var PAID = localStorage.getItem('bonva_paid') === '1';
+// The launch special is a one-time payment for a set time (no auto-renew): end access when it runs out.
+(function(){ var until = parseInt(localStorage.getItem('bonva_paid_until')||'0',10);
+  if(PAID && until && Date.now() > until){ PAID=false; localStorage.setItem('bonva_paid','0'); localStorage.removeItem('bonva_paid_until'); } })();
+function planLabel(){ return localStorage.getItem('bonva_couples')==='1' ? 'Couples' : 'Individual'; }
 var profile = JSON.parse(localStorage.getItem('bonva_profile') || '{}');
 var scoreHistory = JSON.parse(localStorage.getItem('bonva_scores') || '[]');
 var streak = parseInt(localStorage.getItem('bonva_streak') || '0');
@@ -1757,7 +1788,10 @@ function finishOnboarding(){
 // ═══════════════════════════════════════════════════
 var VIEW_TITLES={dashboard:'Dashboard',quiz:'Relationship Quiz',couplesquiz:'Couples Quiz',coach:'Nova Coach',couplescoach:'Couples Coaching',daily:'Daily Question',journeys:'Journeys',activities:'Activities',progress:'Progress',settings:'Settings',therapist:'Therapist Review'};
 
+var navFromHistory=false;
 function nav(v){
+  if(!navFromHistory && v!==curView){ try{ history.pushState({bonvaView:v},'',location.pathname+location.search+'#'+v); }catch(e){} }
+  navFromHistory=false;
   curView=v;
   document.querySelectorAll('.sb-item[data-view]').forEach(function(el){ el.classList.toggle('active',el.dataset.view===v); });
   document.querySelectorAll('.bn-item[data-view]').forEach(function(el){ el.classList.toggle('active',el.dataset.view===v); });
@@ -1768,6 +1802,17 @@ function nav(v){
   if(views[v]) views[v](vc);
 }
 document.querySelectorAll('.sb-item[data-view]').forEach(function(el){ el.addEventListener('click',function(){ nav(el.dataset.view); }); });
+// Back (button, swipe or browser) goes to the previous screen; an open popup closes first.
+try{ history.replaceState({bonvaView:'dashboard'},'',location.pathname+location.search); }catch(e){}
+window.addEventListener('popstate',function(e){
+  var open=document.querySelector('.modal-bg.open');
+  if(open){ open.classList.remove('open'); try{ history.pushState({bonvaView:curView},'',location.pathname+location.search+'#'+curView); }catch(x){} return; }
+  var v=(e.state&&e.state.bonvaView)||'dashboard';
+  navFromHistory=true; nav(v);
+});
+// Old Android app (before 1.9) draws under the status bar without telling the page: make room.
+(function(){ var ua=navigator.userAgent||''; if(/; wv\)/.test(ua) && !window.BonvaAndroid && Math.abs(window.innerHeight - screen.height) < 4){
+  document.documentElement.style.setProperty('--wv-top','28px'); document.documentElement.style.setProperty('--wv-bot','16px'); } })();
 
 // ═══════════════════════════════════════════════════
 //  SIDEBAR / TOPBAR STATE
@@ -1776,11 +1821,11 @@ function updateSidebar(){
   var n=profile.myName||'You';
   document.getElementById('sbAv').textContent=n.charAt(0).toUpperCase();
   document.getElementById('sbNm').textContent=n;
-  document.getElementById('sbPl').textContent=PAID?'✦ Premium':'Free plan';
+  document.getElementById('sbPl').textContent=PAID?'✦ '+planLabel():'Free plan';
   document.getElementById('tbStreak').textContent=streak;
   var tp=document.getElementById('tbPlan');
   tp.className='tb-plan'+(PAID?' premium':'');
-  tp.textContent=PAID?'✦ Premium':'⭐ Free Plan';
+  tp.textContent=PAID?'✦ '+planLabel():'⭐ Free Plan';
   var ub=document.getElementById('sbUpBtn');
   ub.classList.toggle('hidden',PAID);
 }
@@ -1804,11 +1849,12 @@ var PROMO_FEATURE_NAMES = {coach:'Nova, your AI coach', journeys:'Guided Journey
 function promoFor(plan){
   var o = PROMO[plan];
   if(!o) return null;
-  if(IS_PLAY) return PROMO.playLive ? o : null;
-  return (o.link || o.code) ? o : null;
+  if(plan==='couples'||plan==='couples_annual') return o;           // true everywhere: one plan covers both
+  if(IS_PLAY) return PROMO.playLive ? {id:o.id, headline:'Intro price', terms:'Your intro price is shown on the Google Play screen.'} : null;
+  return SPECIAL_ON ? o : null;
 }
 function renderPromo(){
-  var o = promoFor(selPlanVal) || promoFor('monthly') || promoFor('annual');
+  var o = promoFor(selPlanVal);
   var box = document.getElementById('promoBanner');
   if(!box) return;
   box.style.display = o ? '' : 'none';
@@ -1816,9 +1862,9 @@ function renderPromo(){
     document.getElementById('promoHeadline').textContent = o.headline;
     document.getElementById('promoTerms').textContent = o.terms;
   }
-  var m = document.getElementById('pOptM'), a = document.getElementById('pOptA');
-  if(m) m.classList.toggle('promo-on', !!promoFor('monthly'));
-  if(a) a.classList.toggle('promo-on', !!promoFor('annual'));
+  [['pOptM','monthly'],['pOptA','annual'],['pOptC','couples'],['pOptCA','couples_annual']].forEach(function(x){
+    var el=document.getElementById(x[0]); if(el) el.classList.toggle('promo-on', !!promoFor(x[1]));
+  });
 }
 function openUpgrade(source){
   upgradeSource = (typeof source === 'string' && source) ? source.slice(0,40) : 'button';
@@ -1828,7 +1874,6 @@ function openUpgrade(source){
     from.style.display = feature ? '' : 'none';
     from.textContent = feature ? ('🔒 ' + feature.charAt(0).toUpperCase() + feature.slice(1) + ' is part of Premium.') : '';
   }
-  if(promoFor(selPlanVal) == null && promoFor('monthly')) selPlan('monthly');
   renderPromo();
   openModal('upgradeModal');
 }
@@ -1848,7 +1893,6 @@ function buildStripeUrl(base, plan, offer){
   // client_reference_id shows on the Stripe payment and in webhooks: plan, offer and who bought.
   var ref = [plan, offer ? offer.id : 'std', currentUser ? currentUser.id : 'guest'].join('__').replace(/[^A-Za-z0-9_-]/g,'');
   u.searchParams.set('client_reference_id', ref.slice(0,200));
-  if(offer && !offer.link && offer.code) u.searchParams.set('prefilled_promo_code', offer.code);
   if(currentUser && currentUser.email) u.searchParams.set('prefilled_email', currentUser.email);
   u.searchParams.set('utm_source', 'bonva_app');
   u.searchParams.set('utm_campaign', offer ? offer.id : 'standard');
@@ -1874,8 +1918,9 @@ function goPay(){
     window.BonvaAndroid.purchase(p[0],p[1]);
     return;
   }
-  var urls={monthly:STRIPE_MONTHLY,annual:STRIPE_ANNUAL,couples:STRIPE_COUPLES,couples_annual:STRIPE_COUPLES_ANNUAL};
-  var base = (offer && offer.link) ? offer.link : (urls[plan]||STRIPE_MONTHLY);
+  var indiv = SPECIAL_ON ? STRIPE_LINKS.special : STRIPE_LINKS.regular;
+  var urls={monthly:indiv.monthly,annual:indiv.annual,couples:STRIPE_LINKS.couples,couples_annual:STRIPE_LINKS.couples_annual};
+  var base = urls[plan]||indiv.monthly;
   if(base.indexOf('REPLACE')>-1){ toast('Couples annual coming soon — choose another plan for now.'); return; }
   var built = buildStripeUrl(base, plan, offer);
   try { localStorage.setItem('bonva_pending_offer', JSON.stringify({plan:plan, offer:offer?offer.id:null, at:Date.now()})); } catch(e){}
@@ -2755,11 +2800,11 @@ function renderSettings(c){
     :'<p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">Unlock Nova, Journeys, Love Language Quiz, and all premium features.</p><button class="btn btn-gold btn-lg w100" onclick="openUpgrade()" style="justify-content:center;border-radius:14px">✦ Upgrade to Premium</button>'
       +(IS_PLAY?'<button class="btn btn-ghost btn-sm w100" onclick="restorePlayPurchases()" style="justify-content:center;margin-top:10px">Restore Purchases</button>':''))
     +'</div>'
-    +'<div class="card mb20"><div class="section-title">Get the Mobile App</div>'
+    +(IS_PLAY?'':'<div class="card mb20"><div class="section-title">Get the Mobile App</div>'
     +'<p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Download Bonva for iOS & Android.</p>'
     +'<a href="'+(IOS_URL||'#')+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px;text-decoration:none;opacity:'+(IOS_URL?1:.5)+'"><span style="font-size:22px">🍎</span><span><span style="display:block;font-size:10px;color:var(--muted)">Coming soon</span><span style="display:block;font-size:14px;font-weight:600">App Store</span></span></a>'
     +'<a href="'+(ANDROID_URL||'#')+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-decoration:none;opacity:'+(ANDROID_URL?1:.5)+'"><span style="font-size:22px">▶</span><span><span style="display:block;font-size:10px;color:var(--muted)">'+(ANDROID_URL?'Get it on':'Coming soon')+'</span><span style="display:block;font-size:14px;font-weight:600">Google Play</span></span></a>'
-    +'</div>'
+    +'</div>')
     +'<div class="card mb20" id="partnerCard">'+partnerCardHTML()+'</div>'
 
     +'<div class="card"><div class="section-title">Data & Privacy</div>'
@@ -3060,7 +3105,7 @@ async function loadPartnerDQAnswer(){
 function renderGate(c,title,desc,icon){
   var src = (typeof curView==='string' && curView) ? curView : 'gate';
   if(title.indexOf('Settle It')===0) src='settle';
-  c.innerHTML='<div class="ug-wrap fade-up"><span class="ug-icon">'+icon+'</span><h2 class="ug-title">'+title+'</h2><p class="ug-sub">'+desc+'</p><button class="btn btn-gold btn-lg" onclick="openUpgrade(\''+src+'\')">✦ Unlock Premium</button><p style="font-size:12px;color:var(--dim);margin-top:12px">From $12.99/month · Cancel anytime</p></div>';
+  c.innerHTML='<div class="ug-wrap fade-up"><span class="ug-icon">'+icon+'</span><h2 class="ug-title">'+title+'</h2><p class="ug-sub">'+desc+'</p><button class="btn btn-gold btn-lg" onclick="openUpgrade(\''+src+'\')">✦ Unlock Premium</button><p style="font-size:12px;color:var(--dim);margin-top:12px">Individual from $5.99/month · Couples from $9.99/month</p></div>';
   // A locked feature should never be a dead end: show the offer right away.
   setTimeout(function(){ if(!PAID) openUpgrade(src); }, 250);
 }
