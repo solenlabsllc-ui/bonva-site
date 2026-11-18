@@ -337,7 +337,7 @@ body{
   background:rgba(13,5,32,.9);
   backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);
-  display:flex;align-items:center;
+  display:flex;align-items:center;justify-content:flex-end;
   padding:0 36px;gap:16px;
   position:sticky;top:0;z-index:100;
 }
@@ -370,7 +370,7 @@ body{
 }
 .tb-plan:hover{opacity:.8;}
 
-#viewContent{padding:20px 16px 80px;}
+#viewContent{padding:20px 16px 80px;overflow-x:hidden;}
 
 /* ══════════════════════════════════════════════════
    ONBOARDING GATE — shown before app unlocks
@@ -1054,6 +1054,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   .ob-card{max-width:100%;box-sizing:border-box;}
 }
 .tb-title{display:none !important;}
+/* ob-mode: logo shrinks during onboarding steps (same compact size as app-mode) */
+#hero.ob-mode .hero-logo-text{font-size:min(44px,11vw)!important;}
 </style>
 </head>
 <body>
@@ -1804,6 +1806,8 @@ window.addEventListener('popstate',function(e){
   var open=document.querySelector('.modal-bg.open');
   if(open){ open.classList.remove('open'); try{ history.pushState({bonvaView:curView},'',location.pathname+location.search+'#'+curView); }catch(x){} return; }
   var v=(e.state&&e.state.bonvaView)||'dashboard';
+  // If navigating back to activities list (no specific activity in state), clear the sub-view
+  if(v==='activities' && activeAct && !((e.state||{}).act)) activeAct=null;
   navFromHistory=true; nav(v);
 });
 // Old Android app (before 1.9) draws under the status bar without telling the page: make room.
@@ -1907,7 +1911,8 @@ function selPlan(p){
 function goPay(){
   var plan = selPlanVal || 'monthly';
   var offer = promoFor(plan);
-  if(IS_PLAY){
+  if(IS_PLAY || !!window.BonvaAndroid){
+    IS_PLAY = true;
     var p=PLAY_PLANS[plan]||PLAY_PLANS.monthly;
     trackCheckout(plan, offer ? offer.id : null, 'google_play', null);
     playBuying=true;
@@ -1957,11 +1962,22 @@ window.onBonvaPurchase=function(r){
   if(!r.acknowledged) window.BonvaAndroid.acknowledge(r.token);
 };
 function restorePlayPurchases(){ playBuying=true; window.BonvaAndroid.restorePurchases(); toast('Checking Google Play for your subscription…'); }
-if(IS_PLAY){
+function setupPlayBilling(){
+  IS_PLAY = true;
   document.getElementById('payNote').innerHTML='Billed through Google Play. Renews automatically each month or year until you cancel. Cancel anytime in Google Play → Payments &amp; subscriptions → Subscriptions.'
     +'<br><a href="#" onclick="closeModal(\'upgradeModal\');return false;" style="display:inline-block;margin-top:10px;color:var(--muted);font-size:12px;">No thanks</a>';
   document.getElementById('codeBlock').style.display='none';
-  window.addEventListener('load',function(){ window.BonvaAndroid.restorePurchases(); });
+  try{ window.BonvaAndroid.restorePurchases(); }catch(e){}
+}
+if(IS_PLAY){
+  window.addEventListener('load', setupPlayBilling);
+} else {
+  // Some Android WebView versions register the JS interface slightly after script parse;
+  // re-check once the DOM is settled.
+  document.addEventListener('DOMContentLoaded', function(){
+    if(!IS_PLAY && window.BonvaAndroid) setupPlayBilling();
+  });
+  setTimeout(function(){ if(!IS_PLAY && window.BonvaAndroid) setupPlayBilling(); }, 300);
 }
 
 // ═══════════════════════════════════════════════════
@@ -2429,18 +2445,23 @@ function renderActivities(c){
     +actCard('📖','Our Timeline','A living journal of your relationship\'s milestones.','timeline',false,'Anytime')
     +actCard('📅','Special Dates','Never forget the dates that matter.','dates',false,'Ongoing')
     +'</div>'
-    +'<a href="https://fovuapp.app" target="_blank" style="display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,rgba(240,135,74,.15),rgba(196,94,34,.08));border:2px solid rgba(240,135,74,.4);border-radius:18px;padding:20px 22px;margin-top:16px;text-decoration:none;transition:all .2s;">'
-    +'<span style="font-size:40px;flex-shrink:0;filter:drop-shadow(0 2px 8px rgba(240,135,74,.4));">🔥</span>'
+    +'<a href="https://fovuapp.app" target="_blank" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(240,135,74,.15),rgba(196,94,34,.08));border:2px solid rgba(240,135,74,.4);border-radius:16px;padding:14px 16px;margin-top:16px;text-decoration:none;transition:all .2s;max-width:100%;box-sizing:border-box;">'
+    +'<span style="font-size:28px;flex-shrink:0;filter:drop-shadow(0 2px 8px rgba(240,135,74,.4));">🔥</span>'
     +'<div style="flex:1;min-width:0;">'
-    +'<div style="font-size:16px;font-weight:700;color:rgba(255,200,140,.95);margin-bottom:4px;">Plan Date Night with Fovu</div>'
-    +'<div style="font-size:13px;color:rgba(255,165,80,.7);line-height:1.5;">The card game that gets couples actually talking. Put the phone between you.</div>'
+    +'<div style="font-size:14px;font-weight:700;color:rgba(255,200,140,.95);margin-bottom:2px;">Plan Date Night with Fovu</div>'
+    +'<div style="font-size:12px;color:rgba(255,165,80,.7);line-height:1.4;">The card game that gets couples talking.</div>'
     +'</div>'
-    +'<span style="font-size:22px;color:rgba(240,135,74,.6);flex-shrink:0;">→</span>'
+    +'<span style="font-size:18px;color:rgba(240,135,74,.6);flex-shrink:0;">→</span>'
     +'</a>';
+}
+function enterAct(id){
+  activeAct=id;
+  try{ history.pushState({bonvaView:'activities',act:id},'',location.pathname+location.search+'#'+id); }catch(e){}
+  renderActivities(document.getElementById('viewContent'));
 }
 function actCard(e,t,d,id,pro,time){
   var locked=pro&&!PAID;
-  var oc=locked?"openUpgrade('activity')":"activeAct='"+id+"';nav('activities')";
+  var oc=locked?"openUpgrade('activity')":"enterAct('"+id+"')";
   return '<div class="card a4" style="cursor:pointer;transition:all .2s" onclick="'+oc+'"'
     +' onmouseover="this.style.transform=\'translateY(-3px)\'" onmouseout="this.style.transform=\'\'">'
     +'<div class="fb mb12"><span style="font-size:30px">'+e+'</span>'
@@ -2474,7 +2495,7 @@ function renderGratitude(c){
   var name1=profile.myName||'Partner 1';
   var name2=profile.partnerName||'Partner 2';
   var whose=gratTurn%2===0?name1:name2;
-  var history=gratShared.slice(-4).reverse().map(function(g){
+  var history=gratShared.slice(0).reverse().map(function(g){
     return '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">'
       +'<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">'+g.who+'</div>'
       +'<div style="font-size:14px;color:var(--muted);line-height:1.6;font-style:italic">"'+g.text+'"</div></div>';
@@ -3836,6 +3857,7 @@ function goToSplash(){
 }
 function dismissOpening(){
   document.getElementById('openingOverlay').classList.add('hidden');
+  document.getElementById('hero').classList.add('ob-mode');
   // Go straight to names — step 1 is already active, no need to advance
 }
 // ── Service Worker Registration ──
