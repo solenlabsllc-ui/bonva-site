@@ -1872,7 +1872,7 @@ function openUpgrade(source){
   var feature = PROMO_FEATURE_NAMES[upgradeSource];
   if(from){
     from.style.display = feature ? '' : 'none';
-    from.textContent = feature ? ('🔒 ' + feature.charAt(0).toUpperCase() + feature.slice(1) + ' is part of Premium.') : '';
+    from.textContent = feature ? ('🔒 ' + feature.charAt(0).toUpperCase() + feature.slice(1) + ' is included in Individual and Couples.') : '';
   }
   renderPromo();
   openModal('upgradeModal');
