@@ -1056,6 +1056,26 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .tb-title{display:none !important;}
 /* ob-mode: logo shrinks during onboarding steps (same compact size as app-mode) */
 #hero.ob-mode .hero-logo-text{font-size:min(44px,11vw)!important;}
+
+/* ── Daily reveal + couple streak (Nov 18) ── */
+.dq-lock{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px dashed rgba(253,230,138,.3);border-radius:16px;padding:16px 18px;}
+.dq-lock .lk{font-size:26px;animation:lkPulse 2.4s ease-in-out infinite;}
+@keyframes lkPulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.12);opacity:1}}
+.dq-reveal{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:560px){.dq-reveal{grid-template-columns:1fr;}}
+.dq-ans{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:16px;padding:14px 16px;opacity:0;transform:translateY(14px) scale(.98);}
+.dq-ans.in{animation:ansIn .6s cubic-bezier(.2,.8,.2,1) forwards;}
+.dq-ans.in.two{animation-delay:.35s;}
+@keyframes ansIn{to{opacity:1;transform:none}}
+.dq-ans .who{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.dq-ans .txt{font-size:14px;color:var(--white);line-height:1.6;word-break:break-word;}
+.dq-deeper{margin-top:12px;background:linear-gradient(135deg,rgba(192,67,106,.16),rgba(91,63,140,.2));border:1px solid rgba(244,114,182,.3);border-radius:16px;padding:14px 16px;}
+.dq-deeper .k{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--pink);margin-bottom:6px;}
+.dq-deeper.locked .q{filter:blur(5px);user-select:none;}
+.cf-piece{position:fixed;top:-12px;width:8px;height:12px;border-radius:2px;z-index:3000;pointer-events:none;animation:cfFall linear forwards;}
+@keyframes cfFall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+.cs-card .stat-val{display:flex;align-items:baseline;gap:6px;}
+.cs-saves{font-size:11px;color:var(--muted);margin-top:4px;}
 </style>
 </head>
 <body>
@@ -1996,6 +2016,7 @@ function renderDashboard(c){
   html+='<div class="grid-4 a2 mb24">';
   html+='<div class="stat-card"><div class="stat-val">'+(ls?ls.score:'—')+'</div><div class="stat-label">Relationship Score</div>'+(ls?'<div class="stat-note up">'+scoreLabel(ls.score)+'</div>':'<div class="stat-note"><button class="btn btn-primary btn-sm mt8" onclick="nav(\'quiz\')">Take quiz →</button></div>')+'</div>';
   html+='<div class="stat-card"><div class="stat-val">'+streak+'</div><div class="stat-label">Day Streak 🔥</div><div class="stat-note up">Keep it going</div></div>';
+  html+=coupleStreakCardHTML();
   html+='<div class="stat-card"><div class="stat-val">'+scoreHistory.length+'</div><div class="stat-label">Check-ins taken</div></div>';
   html+='<div class="stat-card"><div class="stat-val">'+(bucketList.filter(function(b){return b.done;}).length)+'/'+bucketList.length+'</div><div class="stat-label">Bucket list done</div></div>';
   html+='</div>';
@@ -2305,48 +2326,99 @@ function getDailyQ(){
   var dayOfYear=Math.floor((d-new Date(d.getFullYear(),0,0))/(1000*60*60*24));
   return DAILY_Q[dayOfYear%DAILY_Q.length];
 }
+// Follow-up questions shown after both partners answer ("go deeper" = Premium)
+var DQ_FOLLOWUPS = {
+  Adventure:['What made that feel exciting to you?','What would make it feel safe enough to actually try?','When could we do a small version of it this month?'],
+  Communication:['When do you feel most heard by me?','What is one thing I could say more often?','Is there a topic we tend to avoid?'],
+  Conflict:['What do you need from me in the first five minutes of a disagreement?','What is a fight we keep having that we could settle for good?','How do you know when we have really made up?'],
+  Connection:['When did you last feel really close to me?','What small habit of ours do you never want to lose?','What would make this week feel more connected?'],
+  Curiosity:['What surprised you about my answer?','What is something you have always wanted to ask me?','What do you think I would answer differently five years ago?'],
+  Dreams:['What is the first small step toward that?','How can I help make it happen?','What scares you about wanting it?'],
+  Fun:['When did we last laugh like that?','What should we do this weekend just for fun?','What is a silly tradition we could start?'],
+  Gratitude:['What did I do this week that you appreciated but did not mention?','How do you like to be thanked?','What are you most grateful for about us right now?'],
+  Growth:['What are you working on in yourself right now?','How have we grown since we met?','What would you like us to get better at together?'],
+  Intimacy:['What makes you feel most wanted by me?','What helps you open up?','What is something you would like more of?'],
+  Support:['What does support look like to you on a hard day?','When did I support you well?','What is weighing on you right now?'],
+  Trust:['What builds trust for you day to day?','Is there anything you have been holding back?','When did you first fully trust me?'],
+  Values:['Where did that value come from for you?','Where do our values line up most?','Is there a value we see differently?']
+};
+function dqFollowup(q){
+  var list=DQ_FOLLOWUPS[q.cat]||DQ_FOLLOWUPS.Connection;
+  var d=new Date(); return list[(d.getDate()+d.getMonth())%list.length];
+}
+function bonvaBuzz(pattern){ try{ if(navigator.vibrate) navigator.vibrate(pattern||[30,40,60]); }catch(e){} }
+function bonvaConfetti(){
+  var cols=['#fde68a','#f472b6','#c0436a','#a78bfa','#fff'];
+  for(var i=0;i<60;i++){ (function(i){
+    var el=document.createElement('div'); el.className='cf-piece';
+    el.style.left=(Math.random()*100)+'vw'; el.style.background=cols[i%cols.length];
+    el.style.animationDuration=(1.6+Math.random()*1.4)+'s'; el.style.animationDelay=(Math.random()*.4)+'s';
+    document.body.appendChild(el); setTimeout(function(){ el.remove(); },3600);
+  })(i); }
+}
+var dqPollTimer=null;
 function renderDaily(c){
+  if(dqPollTimer){ clearInterval(dqPollTimer); dqPollTimer=null; }
   var q=getDailyQ();
-  var todayKey=getTodayKey();
-  var answered=localStorage.getItem('bonva_dq_'+todayKey);
-  var now=new Date();
-  var todayStr=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate();
+  var todayStr=bonvaTodayStr();
   var myAnswer=(profile.dqAnswer&&profile.dqAnswerDate===todayStr)?profile.dqAnswer:null;
+  var talked=localStorage.getItem('bonva_dq_'+getTodayKey());
+  var linked=!!profile.partnerId;
+  var pName=esc(partnerName ? partnerName() : (profile.partnerName||'your partner'));
   var cats=[...new Set(DAILY_Q.map(function(x){return x.cat;}))];
-  c.innerHTML='<span class="eyebrow a1">Daily Practice</span>'
+  var h='<span class="eyebrow a1">Daily Practice</span>'
     +'<h1 class="view-title a2">Today\'s Question</h1>'
-    +'<p class="view-sub a3" style="margin-bottom:24px">One question. One conversation. Every day with '+(profile.partnerName||'your partner')+'.</p>'
-    +'<div class="dq-card a3 mb20" style="position:relative">'
-    +'<div class="dq-cat">'+q.cat+'</div>'
-    +'<div class="dq-text">'+q.q+'</div>'
-    +(answered
-      ? '<div style="margin-top:16px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green)"><span>&#10003;</span><span>Asked today!</span></div>'
-      : '<button class="btn btn-primary btn-sm mt16" onclick="markDQAnswered()">&#10003; We asked this today</button>')
-    +'</div>'
-    +(myAnswer
-      ? '<div class="card a3 mb16"><div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Your Answer</div><div style="font-size:14px;color:var(--white);line-height:1.65">'+myAnswer+'</div></div>'
-      : (answered ? '<div class="card a3 mb16"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">Share your answer</div><textarea id="dqAnswerInput" placeholder="What did you say?" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);outline:none;resize:vertical;min-height:80px;line-height:1.6"></textarea><button class="btn btn-primary btn-sm mt8" onclick="submitDQAnswer()">Save My Answer</button></div>' : ''))
-    +(profile.partnerId ? '<div id="partnerDQAnswer" class="card a3 mb16"><div style="font-size:13px;color:var(--muted);font-style:italic">Loading partner\'s answer...</div></div>' : '')
-    +'<div class="card a4" style="background:rgba(255,255,255,.03);border-style:dashed;margin-bottom:20px">'
-    +'<div style="display:flex;align-items:center;gap:12px">'
-    +'<span style="font-size:28px">&#128197;</span>'
-    +'<div><div style="font-size:13px;font-weight:600;margin-bottom:2px">A new question every day</div>'
-    +'<div style="font-size:12px;color:var(--muted)">Come back tomorrow for your next question. Building the habit is the practice.</div></div>'
-    +'</div></div>'
-    +'<div class="section-title a4" style="margin-bottom:12px">Browse by Category</div>'
+    +'<p class="view-sub a3" style="margin-bottom:24px">Answer on your own. '+(linked?'You\'ll see '+pName+'\'s answer once you both have.':'Link with your partner to see each other\'s answers.')+'</p>'
+    +'<div class="dq-card a3 mb20" style="position:relative"><div class="dq-cat">'+esc(q.cat)+'</div><div class="dq-text">'+esc(q.q)+'</div></div>';
+  if(!myAnswer){
+    h+='<div class="card a3 mb16"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">Your answer</div>'
+      +'<textarea id="dqAnswerInput" maxlength="1200" placeholder="Be honest. '+(linked?pName+' won\'t see it until they answer too.':'It stays private.')+'" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:\'DM Sans\',sans-serif;font-size:14px;color:var(--white);outline:none;resize:vertical;min-height:90px;line-height:1.6"></textarea>'
+      +'<button class="btn btn-primary btn-sm mt8" id="dqSubmitBtn" onclick="submitDQAnswer()">Lock in my answer 🔒</button>'
+      +(talked?'':'<div style="margin-top:10px"><a href="#" onclick="markDQAnswered();return false;" style="font-size:12px;color:var(--muted)">We talked about it in person instead</a></div>')
+      +'</div>';
+  }
+  h+='<div id="dqRevealBox" class="a3 mb16"></div>';
+  h+='<div class="section-title a4" style="margin:20px 0 12px">Browse by Category</div>'
     +'<div class="fc gap8 a4" style="flex-wrap:wrap" id="dqCatBtns">'
-    +['All',...cats].map(function(cat){
-      var lbl=cat==='All'?'\u2756 All':cat;
-      return '<button class="btn btn-ghost btn-sm" onclick="dqPreview(\x27'+cat+'\x27)">'+lbl+'</button>';
-    }).join('')
-    +'</div>'
-    +'<p class="a4" style="font-size:12px;color:var(--dim);margin-top:8px">Previewing categories won\'t change your daily question.</p>';
-  if(profile.partnerId) loadPartnerDQAnswer();
+    +['All',...cats].map(function(cat){ var lbl=cat==='All'?'❖ All':cat; return '<button class="btn btn-ghost btn-sm" onclick="dqPreview(\x27'+cat+'\x27)">'+lbl+'</button>'; }).join('')
+    +'</div><p class="a4" style="font-size:12px;color:var(--dim);margin-top:8px">Previewing categories won\'t change your daily question.</p>';
+  c.innerHTML=h;
+  if(myAnswer) dqRenderReveal(q,myAnswer);
+}
+async function dqRenderReveal(q,myAnswer){
+  var box=document.getElementById('dqRevealBox'); if(!box) return;
+  var todayStr=bonvaTodayStr();
+  var mine='<div class="dq-ans in"><div class="who">You</div><div class="txt">'+esc(myAnswer)+'</div></div>';
+  if(!profile.partnerId){
+    box.innerHTML='<div class="dq-reveal">'+mine+'</div>'
+      +'<div class="dq-lock" style="margin-top:12px"><span class="lk">💞</span><div><div style="font-size:14px;font-weight:600;color:var(--white)">See your partner\'s answer side by side</div><div style="font-size:12px;color:var(--muted)">Link your accounts in Settings → Partner. It takes one 6-character code.</div><button class="btn btn-ghost btn-sm mt8" onclick="nav(\'settings\')">Link now →</button></div></div>';
+    return;
+  }
+  var partner=await fetchPartnerData();
+  var pn=esc((partner&&partner.my_name)||profile.partnerName||'Your partner');
+  if(!partner||partner.dq_answer_date!==todayStr||!partner.dq_answer){
+    box.innerHTML='<div class="dq-reveal">'+mine+'</div>'
+      +'<div class="dq-lock" style="margin-top:12px"><span class="lk">🔒</span><div><div style="font-size:14px;font-weight:600;color:var(--white)">'+pn+'\'s answer is waiting</div><div style="font-size:12px;color:var(--muted)">It unlocks the moment you\'ve both answered. We\'ll keep checking.</div></div></div>';
+    if(!dqPollTimer) dqPollTimer=setInterval(function(){
+      if(curView!=='daily'){ clearInterval(dqPollTimer); dqPollTimer=null; return; }
+      dqRenderReveal(q,myAnswer);
+    },20000);
+    return;
+  }
+  if(dqPollTimer){ clearInterval(dqPollTimer); dqPollTimer=null; }
+  var first=localStorage.getItem('bonva_revealed_'+todayStr)!=='1';
+  var deeper=dqFollowup(q);
+  box.innerHTML='<div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--pink);margin-bottom:10px">✨ You both answered</div>'
+    +'<div class="dq-reveal">'+mine+'<div class="dq-ans in two"><div class="who">'+pn+'</div><div class="txt">'+esc(partner.dq_answer)+'</div></div></div>'
+    +(PAID
+      ? '<div class="dq-deeper"><div class="k">Go deeper together</div><div class="q" style="font-size:15px;color:var(--white);line-height:1.5">'+esc(deeper)+'</div></div>'
+      : '<div class="dq-deeper locked" onclick="openUpgrade(\'go_deeper\')" style="cursor:pointer"><div class="k">Go deeper together · Premium</div><div class="q" style="font-size:15px;color:var(--white);line-height:1.5">'+esc(deeper)+'</div><div style="font-size:12px;color:var(--gold);margin-top:8px">🔓 Unlock tonight\'s follow-up question</div></div>');
+  updateCoupleStreakUI();
+  if(first){ localStorage.setItem('bonva_revealed_'+todayStr,'1'); bonvaConfetti(); bonvaBuzz([30,60,30,60,120]); }
 }
 function markDQAnswered(){
   localStorage.setItem('bonva_dq_'+getTodayKey(),'1');
-  var now=new Date();
-  var todayStr=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate();
+  var todayStr=bonvaTodayStr();
   var lastStreakDate=localStorage.getItem('bonva_streak_date')||'';
   if(lastStreakDate!==todayStr){
     streak=parseInt(localStorage.getItem('bonva_streak')||'0')+1;
@@ -2356,9 +2428,56 @@ function markDQAnswered(){
     if(el) el.textContent=streak;
   }
   updateSidebar();
-  toast('\uD83D\uDD25 Day '+streak+' streak! Come back tomorrow.');
+  bonvaBuzz(25);
+  toast('🔥 Day '+streak+' streak! Come back tomorrow.');
   renderDaily(document.getElementById('viewContent'));
 }
+// ── Couple streak: days you BOTH answered, with grace "saves" (1/month free, 3/month Couples) ──
+function bonvaDateStr(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function myAnswerDates(){
+  var a=[]; try{ a=JSON.parse(localStorage.getItem('bonva_shared_answers')||'[]'); }catch(e){}
+  var set={}; a.forEach(function(x){ if(x&&x.date) set[x.date]=1; });
+  if(profile.dqAnswer&&profile.dqAnswerDate) set[profile.dqAnswerDate]=1;
+  return set;
+}
+function partnerAnswerDates(){
+  var set={}; var a=(partnerShared&&Array.isArray(partnerShared.daily_answers))?partnerShared.daily_answers:[];
+  a.forEach(function(x){ if(x&&x.date) set[x.date]=1; }); return set;
+}
+function computeCoupleStreak(){
+  var mine=myAnswerDates(), theirs=partnerAnswerDates();
+  var both=function(ds){ return mine[ds]&&theirs[ds]; };
+  var perMonth=(PAID&&localStorage.getItem('bonva_couples')==='1')?3:1;
+  var used={}, n=0, savesUsedThisMonth=0;
+  var d=new Date(); var today=bonvaDateStr(d);
+  if(!both(today)) d.setDate(d.getDate()-1);   // today still open: count from yesterday
+  for(var i=0;i<400;i++){
+    var ds=bonvaDateStr(d), mk=d.getFullYear()+'-'+d.getMonth();
+    if(both(ds)){ n++; }
+    else {
+      used[mk]=(used[mk]||0);
+      if(n>0 && used[mk]<perMonth){ used[mk]++; }   // a save covers a missed day inside a streak
+      else break;
+    }
+    d.setDate(d.getDate()-1);
+  }
+  var nowKey=new Date().getFullYear()+'-'+new Date().getMonth();
+  savesUsedThisMonth=used[nowKey]||0;
+  return { days:n, bothToday:both(today), savesLeft:Math.max(0,perMonth-savesUsedThisMonth), perMonth:perMonth };
+}
+function daysConnected(){
+  if(!partnerState||!partnerState.linked_at) return null;
+  return Math.max(1,Math.floor((Date.now()-new Date(partnerState.linked_at).getTime())/86400000)+1);
+}
+function coupleStreakCardHTML(){
+  if(!profile.partnerId) return '';
+  var cs=computeCoupleStreak(), dc=daysConnected();
+  return '<div class="stat-card cs-card" id="coupleStreakCard"><div class="stat-val">'+cs.days+'<span style="font-size:18px">💞</span></div>'
+    +'<div class="stat-label">Couple streak</div>'
+    +'<div class="stat-note '+(cs.bothToday?'up':'')+'">'+(cs.bothToday?'You both answered today ✓':'Answer today to keep it going')+'</div>'
+    +'<div class="cs-saves">'+cs.savesLeft+' of '+cs.perMonth+' streak save'+(cs.perMonth>1?'s':'')+' left this month'+(dc?' · '+dc+' days connected':'')+'</div></div>';
+}
+function updateCoupleStreakUI(){ var el=document.getElementById('coupleStreakCard'); if(el) el.outerHTML=coupleStreakCardHTML(); }
 function dqPreview(cat){
   var pool=cat==='All'?DAILY_Q:DAILY_Q.filter(function(q){return q.cat===cat;});
   var c=document.getElementById('viewContent');
@@ -2985,7 +3104,7 @@ async function pushSharedData(){
     if(profile.dqAnswer&&profile.dqAnswerDate){
       answers=answers.filter(function(a){return a.date!==profile.dqAnswerDate;});
       answers.push({date:profile.dqAnswerDate,question:(profile.dqAnswerDate===today&&dq)?dq.q:null,answer:String(profile.dqAnswer).slice(0,2000)});
-      answers=answers.slice(-14);
+      answers=answers.slice(-60);
       localStorage.setItem('bonva_shared_answers',JSON.stringify(answers));
     }
     var lastMood=moodLog.length?moodLog[moodLog.length-1]:null;
@@ -3019,7 +3138,8 @@ async function fetchPartnerData(){
     partnerShared=res.data||null;
     if(!res.data) return null;
     var d=res.data, ans=(d.daily_answers||[]);
-    var latest=ans.length?ans[ans.length-1]:null;
+    var today=bonvaTodayStr();
+    var latest=ans.filter(function(a){return a&&a.date===today;})[0]||(ans.length?ans[ans.length-1]:null);
     // Same shape the dashboard and daily question already expect
     return { my_name:d.display_name||partnerState.partner_name||null,
              score_history:JSON.stringify(d.quiz_scores||[]),
@@ -3096,7 +3216,8 @@ async function submitDQAnswer(){
   if(!inp||!inp.value.trim()){ toast('Type your answer first 😊'); return; }
   var now=new Date();
   var todayStr=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate();
-  profile.dqAnswer=inp.value.trim();
+  var btn=document.getElementById('dqSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent='Locking in…'; }
+  profile.dqAnswer=inp.value.trim().slice(0,1200);
   profile.dqAnswerDate=todayStr;
   save('bonva_profile',profile);
   await syncUp();
