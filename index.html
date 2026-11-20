@@ -542,6 +542,7 @@ body{
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
 .grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
+.grid-2>div,.grid-3>div,.grid-4>div{min-width:0;}
 
 /* Stat card */
 .stat-card{
@@ -1468,7 +1469,7 @@ var PREMIUM_CODES  = ['BONVA2025','SOLENLAUNCH','EARLYBIRD','BONVAPRO'];
 var IOS_URL        = '';
 var ANDROID_URL    = 'https://play.google.com/store/apps/details?id=app.bonva';
 // Inside the Android app (window.BonvaAndroid) purchases go through Google Play Billing, never Stripe or access codes
-var IS_PLAY    = !!window.BonvaAndroid;
+var IS_PLAY    = !!window.BonvaAndroid || (window.location.search.indexOf('play=1') !== -1);
 // Inside the Bonva Android app, even an older build without billing (Android WebView, not Facebook/Instagram browsers)
 var IN_ANDROID_APP = IS_PLAY || (/; wv\)/.test(navigator.userAgent||'') && !/FBAN|FBAV|Instagram|Line\//.test(navigator.userAgent||''));
 var PLAY_PLANS = {monthly:['bonva_premium','monthly'], annual:['bonva_premium','yearly'], couples:['bonva_couples','monthly'], couples_annual:['bonva_couples','yearly']};
